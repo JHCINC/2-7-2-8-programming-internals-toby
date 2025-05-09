@@ -1,0 +1,145 @@
+# deep-translator is an open-source translation library by Nidhal Baccouri and contributors.
+# https://github.com/nidhaloff/deep-translator
+# Licensed under the Apache License, Version 2.0
+
+# CustomTkinter is a custom Tkinter framework by Tom Schimansky and contributors.
+# https://github.com/TomSchimansky/CustomTkinter
+# Licensed under MIT License
+
+from customtkinter import *
+from deep_translator import GoogleTranslator
+# import setup
+
+app = CTk()
+app.geometry("700x400")
+set_appearance_mode("dark")
+
+# List the languages for the translation library
+languages = {
+    "English": "en",
+    "Spanish": "es",
+    "French": "fr",
+    "German": "de",
+    "Italian": "It",
+    "Latin": "La",
+    "Danish": "Da"
+}
+
+# Translate
+def translate():
+    text_to_trans = source_language_textbox.get("1.0", "end").strip()
+
+    # Input validation
+    if not text_to_trans:
+        return
+
+    source = source_language_combo.get()
+    target = target_language_combo.get()
+
+    source_language = languages.get(source)
+    target_language = languages.get(target)
+
+    try:
+        trans_text = GoogleTranslator(source=source_language, target=target_language).translate(text_to_trans)
+
+        # Allows the translation to be put in
+        target_language_textbox.configure(state="normal")
+        target_language_textbox.delete("1.0", "end")
+        target_language_textbox.insert("1.0", trans_text)
+        target_language_textbox.configure(state="disabled")
+
+        print("Translation completed successfully")
+
+    except:
+        print("An error has occurred.")  # For testing and debugging purposes
+
+# A clear function to clear all text inputted
+def clear():
+    source_language_textbox.delete("1.0", "end")
+
+# Swap
+def swap():
+    try:
+        # Swap combo boxes
+        source_language_swap = source_language_combo.get()
+        target_language_swap = target_language_combo.get()
+        source_language_combo.set(target_language_swap)
+        target_language_combo.set(source_language_swap)
+
+        # Swap Text
+        source_language_text = source_language_textbox.get("1.0", "end").strip()
+        target_language_text = target_language_textbox.get("1.0", "end").strip()
+        source_language_textbox.delete("1.0", "end")
+        target_language_textbox.delete("1.0", "end")
+
+        source_language_textbox.insert("1.0", target_language_text)
+        target_language_textbox.insert("1.0", source_language_text)
+
+        print("Swapping completed successfully")
+
+    except:
+        print("An error has occurred")
+
+# Create frames for source_language and target_language sides
+source_language_frame = CTkFrame(app)
+source_language_frame.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
+
+target_language_frame = CTkFrame(app)
+target_language_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
+
+# Grid weights
+app.grid_columnconfigure(0, weight=1)
+app.grid_columnconfigure(1, weight=1)
+app.grid_rowconfigure(0, weight=1)
+
+# Source Language Label
+source_label = CTkLabel(source_language_frame, text="Source Language", font=("Segoe UI", 12))
+source_label.pack(pady=(5, 0))
+
+# source_language side components
+source_language_combo = CTkComboBox(
+    source_language_frame,
+    values=["English", "Spanish", "French", "German", "Italian", "Latin", "Danish"],
+    state="readonly",
+    font=("Segoe UI", 12)
+)
+source_language_combo.pack(pady=10, padx=10)
+source_language_combo.set("English")
+
+source_language_textbox = CTkTextbox(source_language_frame, width=300, height=300, font=("Segoe UI", 12))
+source_language_textbox.pack(pady=10, padx=10)
+
+# Target Language Label
+target_label = CTkLabel(target_language_frame, text="Target Language", font=("Segoe UI", 12))
+target_label.pack(pady=(5, 0))
+
+# target_language side components
+target_language_combo = CTkComboBox(
+    target_language_frame,
+    values=["English", "Spanish", "French", "German", "Italian", "Latin", "Danish"],
+    state="readonly",
+    font=("Segoe UI", 12)
+)
+target_language_combo.pack(pady=10, padx=10)
+
+target_language_textbox = CTkTextbox(target_language_frame, width=300, height=300, state="disabled", font=("Segoe UI", 12))
+target_language_textbox.pack(pady=10, padx=10)
+
+# Translate Button
+translate_button = CTkButton(app, text="Translate", command=translate, font=("Segoe UI", 12))
+translate_button.grid(row=1, column=0, columnspan=2, pady=5)
+
+# Exit Button
+exit_button = CTkButton(app, text="Exit", command=app.destroy, font=("Segoe UI", 12))
+exit_button.grid(row=3, column=0, columnspan=2, pady=10)
+
+# Swap Button
+swap_button = CTkButton(app, text="⇄", width=40, height=32, command=swap, font=("Segoe UI", 12))
+swap_button.grid(row=2, column=0, columnspan=2, pady=10)
+
+# Clear all button
+clear_button = CTkButton(app, text="Clear", width=50, height=28, command=clear, font=("Segoe UI", 12))
+clear_button.grid(row=1, column=0, pady=(0, 10), sticky="n")
+
+source_language_textbox.focus_set()
+app.mainloop()
